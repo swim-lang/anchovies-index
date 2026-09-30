@@ -925,19 +925,40 @@ export default function Fridge({ projects, onOpen, active }) {
   }, [active, anyOpen])
 
   // ── Pan the fridge, or slide a magnet ──
+  // Which magnet is under the pointer, worked out from the magnets' own positions.
+  // Some browsers (Safari especially) hit-test badly inside the doors' 3D layers and
+  // hand the press to the fridge instead; this catches those presses.
+  const magnetAt = (clientX, clientY) => {
+    const r = viewRef.current.getBoundingClientRect()
+    const x = (clientX - r.left - cam.x) / cam.z
+    const y = (clientY - r.top - cam.y) / cam.z
+    let hit = null
+    for (const mg of magnets) {
+      const p = pos[mg.id]
+      if (open[p.door]) continue
+      if (Math.abs(x - p.x) <= p.w / 2 && Math.abs(y - p.y) <= p.h / 2 && (!hit || p.z > pos[hit].z)) hit = mg.id
+    }
+    return hit
+  }
+
   const onViewDown = (e) => {
     if (!cam || (e.pointerType === 'mouse' && e.button !== 0)) return
+    if (!e.target.closest?.('.fx-cavity, .fx-back, .fridge-handle, .fridge-controls')) {
+      const id = magnetAt(e.clientX, e.clientY)
+      if (id) return onMagnetDown(id, viewRef.current.querySelector(`[data-mg="${id}"]`))(e)
+    }
     // Doors open from their handles only; a click on the inside of an open door shuts it.
     const leaf = e.target.closest?.('.fx-back')
     const bay = leaf?.closest('.fx-bay.is-open')
     const door = bay ? (bay.classList.contains('is-freezer') ? 'freezer' : 'fridge') : null
     drag.current = { kind: 'pan', x0: e.clientX, y0: e.clientY, cx: cam.x, cy: cam.y, pid: e.pointerId, el: e.currentTarget, moved: false, door }
   }
-  const onMagnetDown = (id) => (e) => {
+  const onMagnetDown = (id, el) => (e) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return
     e.stopPropagation()
+    e.preventDefault() // no text selection or native drag getting in the way
     const p = pos[id]
-    drag.current = { kind: 'magnet', id, x0: e.clientX, y0: e.clientY, px: p.x, py: p.y, pid: e.pointerId, el: e.currentTarget, moved: false }
+    drag.current = { kind: 'magnet', id, x0: e.clientX, y0: e.clientY, px: p.x, py: p.y, pid: e.pointerId, el: el || e.currentTarget, moved: false }
     zTop.current += 1
     setDragDoor(p.door)
     setPos((q) => ({ ...q, [id]: { ...q[id], z: zTop.current } }))
@@ -1064,6 +1085,7 @@ export default function Fridge({ projects, onOpen, active }) {
           transform: `translate(${p.x - PAD - p.w / 2}px, ${p.y - top - p.h / 2}px) rotate(${p.r}deg)`,
           zIndex: p.z,
         }}
+        data-mg={mg.id}
         onPointerDown={onMagnetDown(mg.id)}
         onPointerEnter={() => setHover(mg.id)}
         onPointerLeave={() => setHover((h) => (h === mg.id ? null : h))}
