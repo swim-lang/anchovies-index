@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "anchovies-index",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/kiraknoop/Desktop/Claude/Anchovies Play/anchovies-index", "run", "dev", "--", "--port", "5178", "--strictPort"],
+      "port": 5178
+    }
+  ]
+}

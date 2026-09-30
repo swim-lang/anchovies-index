@@ -1,0 +1,77 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   THROUGH RED LENSES (Freddie)
+   One of the studio's mockups on a brown ground, with a drawn pair of
+   red-lensed glasses over it. Brand colours from the studio's Freddie deck.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.fr-block {
+  --fr-brown: #4b1d11;
+  --fr-cream: #f7f0ed;
+  --fr-red: #ef414a;
+}
+
+.fr-stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--fr-brown);
+  cursor: none;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fr-stage.is-on {
+  cursor: default;
+}
+
+.fr-stage:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.fr-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fr-glasses {
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(30, 10, 4, 0.35));
+}
+
+.fr-grip {
+  position: absolute;
+  touch-action: none;
+  cursor: grab;
+}
+
+.fr-stage.is-held,
+.fr-stage.is-held .fr-grip {
+  cursor: grabbing;
+}
+
+/* On mouse devices the glasses follow the pointer, so the grip needn't show a hand. */
+@media (hover: hover) and (pointer: fine) {
+  .fr-grip {
+    cursor: none;
+  }
+}
+
+.fr-worn {
+  animation: fr-don 520ms var(--ease-fade) both;
+}
+
+@keyframes fr-don {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fr-worn {
+    animation: none;
+  }
+}

@@ -1,0 +1,67 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   THE RINGS (Heartwood)
+   The mark large, in its own black, on a calm off-white ground. Heartwood's
+   colours aren't verified, so nothing else is added.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.hw-ground {
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 8vw, 110px) 16px;
+  background: #f4f3ef;
+  overflow: hidden;
+}
+
+.hw-mark {
+  width: min(70vw, 520px);
+  aspect-ratio: 193.6 / 192.16;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hw-mark:active {
+  cursor: grabbing;
+}
+
+.hw-mark:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 12px;
+}
+
+.hw-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hw-ring {
+  fill: #0c0c0c;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* A slow breath: 1 → 1.03 and back, 4s each way. */
+.hw-mark.is-breathing svg {
+  animation: hw-breathe 4s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+@keyframes hw-breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-mark.is-breathing svg {
+    animation: none;
+  }
+}

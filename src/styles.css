@@ -1,0 +1,4718 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   The Anchovies Index
+   Tokens first. The palette stays close to anchovies.agency (black, white and
+   the site's own greys) so the project imagery supplies the color.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --ground: #e7e7e5; /* index table: the site's #e7e7e7, a breath warmer */
+  --paper: #fbfbf9; /* card stock, and the case-study page */
+  --ink: #0c0c0c;
+  --ink-2: #4c4c4c; /* site token */
+  --muted: #5d5d5a; /* ≥ 4.5:1 on both ground and paper */
+  --rule: rgba(12, 12, 12, 0.14);
+  --rule-strong: rgba(12, 12, 12, 0.82);
+  --plate: #d8d8d5; /* reserved space behind loading images */
+
+  /* Haas Grotesk is the site's face (licensed web font on anchovies.agency).
+     Drop the licensed files into /public/fonts and declare them in fonts.css
+     to use it here. Until then, Helvetica Neue shares the same lineage. */
+  --sans: 'Haas Grot Text Web 75 Bold', 'Neue Haas Grotesk Text', 'Neue Haas Grotesk Display Pro',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mono: 'Fragment Mono', ui-monospace, 'SF Mono', Menlo, monospace; /* also on the site */
+
+  --gutter: clamp(16px, 3.2vw, 44px);
+  --max: 1440px;
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-fade: cubic-bezier(0.2, 0, 0, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+  overscroll-behavior-x: none; /* horizontal trackpad gestures browse the index, not history */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 500; /* the site sets text in Haas Grot Text 65 Medium / 75 Bold; this keeps the fallback as weighty */
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html.case-open,
+html.case-open body {
+  background: var(--paper);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+p,
+h1,
+h2,
+figure,
+dl,
+dd,
+ol {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Understated labels, set like an index's running heads. */
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   INDEX
+   ───────────────────────────────────────────────────────────────────────── */
+
+.index {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--ground);
+}
+
+.index[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+.index-top,
+.index-foot {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px var(--gutter);
+  transition: opacity 0.36s var(--ease-fade) 0.18s;
+}
+
+.index-top {
+  position: relative;
+  border-bottom: 1px solid var(--rule);
+}
+
+.index-foot {
+  border-top: 1px solid var(--rule);
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.index.is-receded .index-top,
+.index.is-receded .index-foot {
+  opacity: 0;
+  transition-delay: 0s;
+  transition-duration: 0.24s;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  justify-self: start;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.brand-mark {
+  width: auto;
+  height: 15px;
+  display: block;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.03em;
+}
+
+.index-title {
+  justify-self: center;
+  color: var(--muted);
+}
+
+.contact {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(50% + 0.85em) / 0 1px no-repeat;
+  transition: background-size 0.3s var(--ease-out);
+}
+
+.contact:hover {
+  background-size: 100% 1px;
+}
+
+/* ── The rotary index ────────────────────────────────────────────────────
+   The stage is a 3D scene viewed from a little above. The rig is one card
+   wide; the cards share one grid cell so the rig takes the card's height, and
+   the ring sits along its bottom edge. Index.jsx writes each card's transform. */
+.stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding-top: calc(var(--step) * 5 + 30px); /* room for the stepped tabs */
+  padding-bottom: 40px;
+  overflow: clip;
+  perspective: 2400px;
+  perspective-origin: 50% 20%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.stage.is-dragging {
+  cursor: grabbing;
+}
+
+.rig {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: var(--cw);
+  transform-style: preserve-3d;
+}
+
+.card {
+  grid-area: 1 / 1;
+  min-width: 0;
+  position: relative;
+  transform-origin: 50% 100%; /* the cards turn on the ring at their foot */
+  transform-style: preserve-3d;
+  will-change: transform;
+  --shade: 0;
+}
+
+.card-face,
+.card-back {
+  opacity: var(--fade, 1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* The reverse is plain card stock, seen when a card has flipped over the ring. */
+.card-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(180deg);
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05), transparent 30%),
+    var(--paper);
+  -webkit-mask: var(--notches);
+  mask: var(--notches);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+.card-recede {
+  transition:
+    opacity 0.42s var(--ease-fade),
+    transform 0.6s var(--ease-out);
+}
+
+.index.is-receded .card:not(.is-active) .card-recede,
+.index.is-receded .ring {
+  opacity: 0;
+}
+
+.index.is-receded .card:not(.is-active) .card-recede {
+  transform: translateY(16px);
+}
+
+.ring {
+  transition: opacity 0.42s var(--ease-fade);
+}
+
+/* Lift = drawing the card up out of the ring. The drop-shadow follows the notches. */
+.card-lift {
+  position: relative;
+  transition:
+    transform 0.4s var(--ease-out),
+    filter 0.4s var(--ease-out);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.1));
+}
+
+.card.is-active .card-lift {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08)) drop-shadow(0 22px 34px rgba(0, 0, 0, 0.2));
+}
+
+@media (hover: hover) {
+  .card.is-active:hover .card-lift {
+    transform: translateY(-14px);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08)) drop-shadow(0 34px 44px rgba(0, 0, 0, 0.24));
+  }
+  .card.is-active:hover .arrow {
+    transform: translateY(-3px);
+  }
+  .card:not(.is-active) .card-tab:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.index.is-busy .card-lift,
+.stage.is-dragging .card-lift {
+  transform: none !important;
+}
+
+.index.is-busy .stage {
+  pointer-events: none;
+}
+
+/* Two bites in the foot, where the card clips onto the ring. */
+:root {
+  --notches: radial-gradient(circle 8px at 36% 100%, transparent 7.5px, #000 8px),
+    radial-gradient(circle 8px at 64% 100%, transparent 7.5px, #000 8px);
+}
+
+.card-paper {
+  --pad: calc(var(--cw) * 0.026);
+  position: relative;
+  background: var(--paper);
+  padding: var(--pad) var(--pad) calc(var(--pad) + 6px);
+  -webkit-mask: var(--notches);
+  mask: var(--notches);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Cards further back sit in the front card's shadow. */
+.card-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #000;
+  opacity: var(--shade);
+  pointer-events: none;
+}
+
+/* Index tabs, stepped across the width like a card file's A–Z. */
+.card-tab {
+  --tab-w: clamp(120px, calc(var(--cw) * 0.2), 190px);
+  position: absolute;
+  bottom: 100%;
+  left: calc(var(--tab-slot) * (100% - var(--tab-w)));
+  width: var(--tab-w);
+  height: 28px;
+  margin: 0 0 -1px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: var(--paper);
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 100%, 0 100%);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.card-tab .tab-num {
+  color: var(--muted);
+}
+
+.card-tab .tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card.is-active .card-tab {
+  cursor: default;
+}
+
+/* The ring: a slim rod running through the notches, with an end cap either side. */
+.ring {
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  bottom: 2px;
+  height: 10px;
+  transform: translateZ(3px);
+  pointer-events: none;
+}
+
+.ring-rod,
+.ring::before,
+.ring::after {
+  position: absolute;
+  content: '';
+}
+
+.ring-rod {
+  inset: 0;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #8d8d89 0%, #e2e2de 38%, #a6a6a2 62%, #6f6f6b 100%);
+  box-shadow: 0 3px 6px -2px rgba(0, 0, 0, 0.35);
+}
+
+.ring::before,
+.ring::after {
+  top: -9px;
+  width: 14px;
+  height: 28px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #1b1b1a, #3a3a38 50%, #1b1b1a);
+}
+
+.ring::before {
+  left: -10px;
+}
+
+.ring::after {
+  right: -10px;
+}
+
+.hero-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+[data-flip] {
+  display: inline-block;
+}
+
+.hero-rule[data-flip] {
+  display: block;
+}
+
+.card-title {
+  --chars: 12;
+  font-weight: 700;
+  font-size: min(calc(var(--cw) * 0.07), calc((var(--cw) - var(--pad) * 2) / (var(--chars) * 0.6)));
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  margin: calc(var(--cw) * 0.03) 0 calc(var(--cw) * 0.022);
+}
+
+.card-image {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: var(--plate);
+}
+
+.card-image img,
+.case-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.card-foot,
+.hero-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-top: calc(var(--cw) * 0.02);
+}
+
+.card-foot .disc {
+  color: var(--ink-2);
+}
+
+.card-open {
+  flex: none;
+  transition: opacity 0.3s var(--ease-fade);
+}
+
+.card:not(.is-active) .card-open {
+  opacity: 0;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.card-button {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.card-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -6px;
+}
+
+.stage.is-dragging .card-button,
+.stage.is-dragging .card-tab {
+  cursor: grabbing;
+}
+
+/* Footer: a printed table of contents, the hint, and the pager. */
+@media (max-width: 1023px) {
+  .toc {
+    display: none !important;
+  }
+  .index-foot {
+    grid-template-columns: 1fr auto;
+  }
+  .hint {
+    justify-self: start;
+  }
+}
+
+.toc-item:not(.is-current) .toc-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.toc {
+  display: flex;
+  gap: 4px 16px;
+  flex-wrap: nowrap;
+  padding: 0;
+  list-style: none;
+  justify-self: start;
+}
+
+.toc-item {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.toc-item:hover,
+.toc-item.is-current {
+  color: var(--ink);
+}
+
+.toc-item.is-current .toc-name {
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+}
+
+.hint {
+  justify-self: center;
+  color: var(--muted);
+  transition: opacity 0.6s var(--ease-fade);
+}
+
+.hint.is-gone {
+  opacity: 0;
+}
+
+.pager {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pager-count {
+  min-width: 5.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pager-sep {
+  color: var(--muted);
+}
+
+.pager-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    opacity 0.2s;
+}
+
+.pager-btn:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.pager-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CASE STUDY
+   ───────────────────────────────────────────────────────────────────────── */
+
+.case {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  background: var(--paper);
+  overflow-x: clip;
+  padding-bottom: clamp(48px, 8vw, 120px);
+}
+
+/* Geometry holds still while the card becomes the page … */
+.case[data-motion='entering'] {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* … and while the page goes back into the card. */
+.case[data-motion='leaving'] {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--leave-top, 0px);
+}
+
+.wrap {
+  width: min(100% - var(--gutter) * 2, var(--max));
+  margin-inline: auto;
+}
+
+.case-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 6px var(--gutter);
+  background: rgba(251, 251, 249, 0.94);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* A solid button for the ways back out: case study → index, drawer → cabinet. */
+.back,
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 16px 0 14px;
+  background: var(--ink);
+  color: var(--paper, #fbfbf9);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+.back:hover,
+.pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2), 0 8px 18px -6px rgba(0, 0, 0, 0.35);
+}
+
+.pill:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+.back span {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.back:hover span,
+.pill:hover span {
+  transform: translateX(-3px);
+}
+
+.pill span {
+  transition: transform 0.3s var(--ease-out);
+}
+
+.case-hero {
+  padding-top: clamp(20px, 3vw, 44px);
+  --cw: min(100vw - var(--gutter) * 2, var(--max));
+}
+
+.case-title {
+  --chars: 12;
+  font-weight: 700;
+  font-size: min(10.4vw, 176px, calc(var(--cw) / (var(--chars) * 0.6)));
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  margin: 0.2em 0 0.16em;
+}
+
+.case-title:focus {
+  outline: none;
+}
+
+.case-image {
+  position: relative;
+  height: min(calc(var(--cw) * 0.5625), 74svh);
+  overflow: hidden;
+  background: var(--plate);
+}
+
+.hero-foot {
+  padding-top: 14px;
+}
+
+/* Intro: statement and facts, on a 12-column grid. */
+.case-intro,
+.case-identity,
+.web-grid,
+.case-preview,
+.case-gallery {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+}
+
+.case-intro {
+  padding-block: clamp(72px, 10vw, 150px);
+  align-items: start;
+}
+
+.lede {
+  grid-column: 1 / span 8;
+  font-weight: 500;
+  font-size: clamp(26px, 3.2vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.facts {
+  grid-column: 10 / span 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 16px;
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 14px;
+}
+
+.facts dt {
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.facts dd {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.facts-wide {
+  grid-column: 1 / -1;
+}
+
+/* Identity */
+.case-identity {
+  align-items: end;
+  row-gap: 32px;
+}
+
+.plate {
+  grid-column: 1 / span 8;
+}
+
+.identity-side {
+  grid-column: 10 / span 3;
+  display: grid;
+  gap: 22px;
+}
+
+.engraving {
+  max-width: 362px; /* 724px source file, shown at 2× */
+}
+
+.statement {
+  font-size: clamp(17px, 1.35vw, 20px);
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+
+/* Section heads reuse the index rule. */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(20px, 3vw, 36px);
+}
+
+.section-head a {
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.section-head a:hover {
+  text-decoration: underline;
+}
+
+.case-stack,
+.case-web {
+  padding-top: clamp(96px, 12vw, 180px);
+}
+
+/* ─── Image stack ─────────────────────────────────────────────────────── */
+
+.stack-stage {
+  position: relative;
+  height: clamp(420px, 52vw, 720px);
+  max-height: calc(100svh - 250px);
+  min-height: 380px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.print,
+.stack-hit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  box-sizing: content-box;
+  padding: clamp(5px, 0.7vw, 10px); /* a paper border around the print, outside the artwork */
+}
+
+.print {
+  background: #fff;
+  --lift: 0;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.14),
+    0 10px 24px -14px rgba(0, 0, 0, 0.32),
+    0 38px 70px -34px rgba(0, 0, 0, calc(var(--lift) * 0.36));
+  transition:
+    transform 0.56s var(--ease-out),
+    box-shadow 0.56s var(--ease-out);
+  will-change: transform;
+}
+
+.print-img,
+.print .img-missing {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.stack-hit {
+  z-index: 50;
+  background: transparent;
+  border: 0;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.stack-hit:active {
+  cursor: grabbing;
+}
+
+.stack-hit:focus-visible {
+  outline-offset: 8px;
+}
+
+.stack-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px 32px;
+  flex-wrap: wrap;
+  margin-top: clamp(16px, 2.5vw, 32px);
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+
+.stack-caption {
+  display: grid;
+  gap: 4px;
+  min-height: 3em;
+}
+
+.stack-caption .label {
+  font-variant-numeric: tabular-nums;
+}
+
+.stack-kind {
+  color: var(--muted);
+}
+
+.stack-text {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.stack-controls {
+  display: flex;
+  gap: 4px;
+  margin-right: -12px;
+}
+
+.text-btn {
+  min-height: 44px;
+  padding: 0 12px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+}
+
+/* ─── The letterhead, as a sheet you can handle ───────────────────────── */
+
+.case-sheet {
+  padding-top: clamp(96px, 12vw, 180px);
+}
+
+.sheet-stage {
+  display: grid;
+  place-items: center;
+  height: clamp(460px, 62vw, 860px);
+  max-height: calc(100svh - 200px);
+  min-height: 420px;
+  perspective: 1500px;
+  container-type: size;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sheet-stage.is-held {
+  cursor: grabbing;
+}
+
+.sheet-stage.is-loupe {
+  cursor: none;
+}
+
+.sheet {
+  --rx: 0deg;
+  --ry: 0deg;
+  --lx: 50%;
+  --ly: 50%;
+  --lift: 0;
+  position: relative;
+  height: min(86cqh, calc(92cqw * 1359 / 981));
+  transform: translateZ(calc(var(--lift) * 60px)) rotateX(var(--rx)) rotateY(var(--ry));
+  transition:
+    transform 0.5s var(--ease-out),
+    box-shadow 0.5s var(--ease-out);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 calc(8px + var(--lift) * 40px) calc(18px + var(--lift) * 60px) calc(-10px - var(--lift) * 10px) rgba(0, 0, 0, calc(0.28 + var(--lift) * 0.08));
+  will-change: transform;
+}
+
+.is-held .sheet {
+  --lift: 1;
+}
+
+.sheet img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Raking light: a soft highlight on the near side, falling off across the grain. */
+.sheet-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at var(--lx) var(--ly), rgba(255, 255, 255, 0.34), transparent 55%),
+    linear-gradient(to bottom right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+  transition: opacity 0.4s;
+}
+
+.loupe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-color: #eee;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 0 5px rgba(255, 255, 255, 0.85),
+    0 14px 30px -8px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── Website + story ─────────────────────────────────────────────────── */
+
+.web-wide {
+  margin-bottom: clamp(40px, 6vw, 96px);
+}
+
+.web-grid {
+  align-items: start;
+}
+
+.story {
+  grid-column: 1 / span 5;
+  font-size: clamp(17px, 1.3vw, 19px);
+  line-height: 1.5;
+  max-width: 36em;
+}
+
+.web-inset {
+  grid-column: 7 / span 6;
+  margin-top: clamp(40px, 8vw, 140px);
+}
+
+/* ─── Preview projects ────────────────────────────────────────────────── */
+
+.case-preview {
+  align-items: start;
+  row-gap: 40px;
+}
+
+.preview-text {
+  grid-column: 1 / span 5;
+  display: grid;
+  gap: 22px;
+  position: sticky;
+  top: 96px;
+}
+
+.preview-text .story {
+  grid-column: auto;
+  max-width: none;
+}
+
+.preview-note {
+  padding-top: 8px;
+}
+
+.preview-a {
+  grid-column: 7 / span 6;
+}
+
+.case-gallery {
+  margin-top: clamp(64px, 9vw, 140px);
+  align-items: end;
+  row-gap: 32px;
+}
+
+.preview-b {
+  grid-column: 1 / span 7;
+}
+
+.preview-c {
+  grid-column: 9 / span 4;
+}
+
+/* ─── End of case ─────────────────────────────────────────────────────── */
+
+.case-end {
+  margin-top: clamp(96px, 12vw, 180px);
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.end-back {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.end-back .label {
+  color: var(--muted);
+}
+
+.end-back-title {
+  font-weight: 700;
+  font-size: clamp(30px, 4.4vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.end-back-title span {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.end-back:hover .end-back-title span {
+  transform: translateX(-6px);
+}
+
+.end-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Missing assets ──────────────────────────────────────────────────── */
+
+.img-missing {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  color: var(--muted);
+  border: 1px dashed var(--rule-strong);
+  background: repeating-linear-gradient(135deg, transparent 0 9px, rgba(0, 0, 0, 0.035) 9px 10px), var(--paper);
+  text-align: center;
+  padding: 12px;
+}
+
+.card-image .img-missing,
+.case-image .img-missing {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+/* ─── Lightbox ────────────────────────────────────────────────────────── */
+
+.lightbox {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(10, 10, 10, 0.94);
+  color: #f4f4f2;
+}
+
+.lightbox::backdrop {
+  background: transparent;
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+  animation: lightbox-in 0.26s var(--ease-fade);
+}
+
+.lightbox[open] .lightbox-img {
+  animation: lightbox-img 0.42s var(--ease-out);
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lightbox-img {
+  from {
+    transform: scale(0.97);
+  }
+}
+
+.lightbox-figure {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 64px var(--gutter) 28px;
+  max-height: 100dvh;
+}
+
+.lightbox-img {
+  max-width: min(92vw, 1600px);
+  max-height: calc(100dvh - 150px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  font-size: 15px;
+}
+
+.lightbox-caption .label {
+  color: #a9a9a5;
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 10px;
+  right: var(--gutter);
+  min-height: 44px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lightbox :focus-visible {
+  outline-color: #f4f4f2;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SMALL SCREENS
+   ───────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 719px) {
+  .index-top {
+    grid-template-columns: 1fr auto;
+    padding-block: 8px;
+  }
+  .index-title {
+    display: none;
+  }
+  .index-foot {
+    grid-template-columns: 1fr auto;
+    padding-block: 10px;
+  }
+  .toc {
+    display: none;
+  }
+  .hint {
+    justify-self: start;
+  }
+
+  .card-paper {
+    --pad: 14px;
+  }
+  .card-title {
+    font-size: min(calc(var(--cw) * 0.105), calc((var(--cw) - 28px) / (var(--chars) * 0.6)));
+    margin: 14px 0 12px;
+  }
+  .card-image {
+    aspect-ratio: 1 / 1;
+  }
+  .card-tab {
+    --tab-w: 54px;
+    height: 24px;
+    padding: 0;
+    justify-content: center;
+  }
+  .card-tab .tab-name {
+    display: none;
+  }
+  .card-tab .tab-num {
+    color: var(--ink);
+  }
+  .card-foot {
+    padding-top: 12px;
+  }
+  .card-foot .disc {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hero-head {
+    gap: 10px;
+  }
+
+  /* Return control sits within thumb reach. */
+  .case-bar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-bottom: 0;
+    border-top: 1px solid var(--rule);
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+  .case {
+    padding-bottom: 96px;
+  }
+  .case-hero {
+    padding-top: 16px;
+  }
+  .case-title {
+    font-size: min(15vw, calc(var(--cw) / (var(--chars) * 0.6)));
+  }
+  .case-image {
+    height: min(calc(var(--cw) * 1.25), 72svh);
+  }
+  .hero-foot {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .preview-text {
+    position: static;
+  }
+  .lede,
+  .facts,
+  .plate,
+  .identity-side,
+  .story,
+  .web-inset,
+  .preview-text,
+  .preview-a,
+  .preview-b,
+  .preview-c {
+    grid-column: 1 / -1;
+  }
+  .facts {
+    margin-top: 40px;
+  }
+  .engraving {
+    max-width: 60%;
+  }
+  .web-inset {
+    margin-top: 40px;
+  }
+  .stack-stage {
+    height: 118vw;
+    max-height: 70svh;
+  }
+  .stack-controls {
+    width: 100%;
+    justify-content: space-between;
+    margin-inline: -12px;
+    width: calc(100% + 24px);
+  }
+  .lightbox-caption {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   REDUCED MOTION: dissolves instead of travel. Everything stays available.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift,
+  .card-recede,
+  .arrow,
+  .back span,
+  .end-back-title span {
+    transition-property: opacity !important;
+    transform: none !important;
+  }
+  .print,
+  .sheet {
+    transition: none;
+  }
+  .lightbox[open] .lightbox-img {
+    animation: none;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   THE DRAWER (default index)
+   Materials: lacquered cabinet, linen-lined drawer, card-stock postcards.
+   Textures are generated overlays in /public/assets/ui (paper-grain, linen).
+   ═════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --lacquer: #dddbd4;
+  --lacquer-lit: #e8e6e0;
+  --lacquer-shade: #c9c7bf;
+  --lining: #4b4944;
+  --stock: #f7f6f2; /* card stock: near white, not yellowed */
+  --metal: #2b2a27;
+  --grain: url('/assets/ui/paper-grain.png');
+  --linen: url('/assets/ui/linen.png');
+}
+
+.drawer-index {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--ground);
+}
+
+.drawer-index[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+.drawer-index .index-top,
+.drawer-index .index-foot {
+  position: relative;
+  z-index: 2;
+  background: var(--ground);
+}
+
+.drawer-foot {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.drawer-foot .hint {
+  grid-column: 2;
+  justify-self: center;
+  text-align: center;
+}
+
+.drawer-foot .drawer-actions {
+  grid-column: 3;
+}
+
+.drawer-count {
+  justify-self: center;
+}
+
+.drawer-actions {
+  justify-self: end;
+  margin-right: -12px;
+}
+
+.drawer-index.is-receded .index-top,
+.drawer-index.is-receded .index-foot {
+  opacity: 0;
+  transition: opacity 0.24s var(--ease-fade);
+}
+
+.drawer-stage {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.drawer-index.is-busy .drawer-stage {
+  pointer-events: none;
+}
+
+.world,
+.drawer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+.drawer {
+  left: 0;
+  top: 0;
+}
+
+/* The drawer's contents ride on an inner slide, which eases out on hover. */
+.drawer-slide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.drawer[data-peek] .drawer-slide {
+  transform: translateY(26px);
+}
+
+.cab,
+.drawer-floor,
+.drawer-wall,
+.drawer-front {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Every panel can be seen from its lit side only. */
+.cab,
+.drawer-wall,
+.drawer-front {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.cab-face {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.04)),
+    var(--grain) 0 0 / 300px,
+    var(--lacquer);
+  background-blend-mode: normal, soft-light, normal;
+}
+
+.cab-top {
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent 40%),
+    var(--grain) 0 0 / 300px,
+    var(--lacquer-lit);
+  background-blend-mode: normal, soft-light, normal;
+}
+
+.cab-inside {
+  background: #1a1917;
+}
+
+.drawer-floor {
+  transform-style: preserve-3d;
+  background: var(--linen) 0 0 / 256px, var(--lining);
+  background-blend-mode: overlay, normal;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.42),
+    inset 0 18px 30px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* The part of the floor still inside the cabinet is in darkness. */
+.drawer-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #111 10%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0) 90%);
+  pointer-events: none;
+}
+
+.drawer-wall {
+  background:
+    var(--grain) 0 0 / 300px,
+    var(--lacquer-shade);
+  background-blend-mode: soft-light, normal;
+  box-shadow: inset 0 -10px 16px -10px rgba(0, 0, 0, 0.35);
+}
+
+.drawer-wall.is-front-inner {
+  background-color: var(--lacquer);
+}
+
+.drawer-front {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18%;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.05)),
+    var(--grain) 0 0 / 300px,
+    var(--lacquer);
+  background-blend-mode: normal, soft-light, normal;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(0, 0, 0, 0.1);
+  cursor: grab;
+  touch-action: none;
+}
+
+.drawer-front:active {
+  cursor: grabbing;
+}
+
+.drawer-front:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+/* A brass-free label holder: dark metal frame, card-stock label. */
+.label-holder {
+  padding: 4px;
+  background: linear-gradient(to bottom, #45443f, var(--metal));
+  border-radius: 2px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.label-card {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 10px 26px 9px;
+  background: var(--grain) 0 0 / 200px, var(--stock);
+  background-blend-mode: soft-light, normal;
+  color: var(--ink);
+}
+
+.label-card-name {
+  font-weight: 700;
+  font-size: clamp(16px, 1.6vw, 24px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.label-card .label {
+  font-size: 10px;
+  color: var(--ink-2);
+}
+
+.pull {
+  width: 30%;
+  max-width: 320px;
+  height: 18px;
+  border-radius: 9px;
+  background: linear-gradient(to bottom, #5a5953 0%, #2e2d2a 45%, #1c1b19 100%);
+  box-shadow:
+    0 6px 8px -3px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.3s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .drawer-front:hover .pull {
+    transform: translateY(2px);
+  }
+}
+
+/* ─── Postcards ────────────────────────────────────────────────────────── */
+
+.postcard {
+  --lift: 0;
+  --fade: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  touch-action: none;
+  cursor: grab;
+}
+
+.postcard:active {
+  cursor: grabbing;
+}
+
+.drawer:not([data-live]) .postcard,
+.drawer:not([data-live]) .loose {
+  pointer-events: none;
+}
+
+/* The drawer you're not looking into fades with the cabinet as the camera tips over. */
+.drawer > * {
+  opacity: var(--dim, 1);
+}
+
+.drawer-index.is-receded .postcard:not([data-presenting]) {
+  --fade: 0;
+}
+
+.pc-turn {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.72s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.postcard.is-flipped .pc-turn {
+  transform: rotateY(180deg);
+}
+
+.pc-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 4.4% 4.4% 0;
+  border-radius: 1.5px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.03) 60%, rgba(0, 0, 0, 0.06)),
+    var(--stock);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  opacity: var(--fade);
+  transition: opacity 0.4s var(--ease-fade);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 calc(3px + var(--lift) * 22px) calc(6px + var(--lift) * 34px) calc(var(--lift) * -6px)
+      rgba(0, 0, 0, calc(0.32 + var(--lift) * 0.14));
+}
+
+.pc-back {
+  transform: rotateY(180deg);
+}
+
+/* Card stock grain across the whole face, image included: it's a printed card. */
+/* Card stock tooth. Strong on the paper, barely there over the printed image. */
+.pc-face {
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.03) 60%, rgba(0, 0, 0, 0.06)),
+    var(--grain);
+  background-size: auto, 256px;
+  background-blend-mode: normal, soft-light;
+}
+
+.pc-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background: var(--grain) 0 0 / 256px;
+  mix-blend-mode: soft-light;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+/* Light catching the card as it's lifted. */
+.pc-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.22) 48%, transparent 66%);
+  opacity: calc(var(--lift) * 0.9);
+  pointer-events: none;
+}
+
+.pc-image {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: var(--plate);
+}
+
+.pc-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.pc-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: calc(var(--ch) * 0.17);
+  min-height: 30px;
+}
+
+.pc-caption .label {
+  font-size: 9.5px;
+  color: var(--ink-2);
+}
+
+.pc-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: calc(var(--cw) * 0.058);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.postcard .card-button {
+  cursor: inherit;
+}
+
+.postcard .card-button:focus-visible {
+  outline-offset: 4px;
+}
+
+/* The back: message left, address and stamp right. */
+.pc-back {
+  display: grid;
+  grid-template-columns: 1.1fr 1px 0.9fr;
+  gap: 5%;
+  padding: 6% 6% 5.5%;
+  color: var(--ink);
+}
+
+.pc-back-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pc-back-message .label {
+  font-size: 9px;
+}
+
+.pc-back-title {
+  font-weight: 700;
+  font-size: calc(var(--cw) * 0.05);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.pc-back-intro {
+  font-size: calc(var(--cw) * 0.031);
+  line-height: 1.32;
+  color: var(--ink-2);
+  overflow: hidden;
+}
+
+.pc-back-disc {
+  margin-top: auto;
+  font-size: 8px !important;
+  color: var(--muted);
+}
+
+.pc-back-divider {
+  background: var(--rule-strong);
+  opacity: 0.4;
+}
+
+.pc-back-address {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pc-stamp {
+  align-self: flex-end;
+  display: grid;
+  place-items: center;
+  width: 26%;
+  aspect-ratio: 5 / 6;
+  margin-bottom: auto;
+  border: 1px dashed rgba(12, 12, 12, 0.4);
+}
+
+.pc-stamp .label {
+  font-size: 8.5px;
+  color: var(--muted);
+}
+
+.pc-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(12, 12, 12, 0.22);
+  font-size: calc(var(--cw) * 0.03);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-line .label {
+  font-size: 8px;
+  flex: none;
+}
+
+.pc-back-open {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 6px 0;
+  background: none;
+  border: 0;
+  font-size: 9.5px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.pc-turn-btn {
+  position: absolute;
+  top: -11px;
+  right: -11px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(12, 12, 12, 0.25);
+  border-radius: 50%;
+  background: var(--stock);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateZ(3px);
+  transition: opacity 0.2s;
+}
+
+.postcard:hover .pc-turn-btn,
+.postcard:focus-within .pc-turn-btn {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .drawer-index.is-open .pc-turn-btn {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 719px) {
+  .drawer-foot {
+    grid-template-columns: 1fr auto;
+  }
+  .drawer-foot .hint {
+    grid-column: 1;
+    justify-self: start;
+    text-align: left;
+  }
+  .drawer-foot .drawer-actions {
+    grid-column: 2;
+  }
+  .drawer-count {
+    display: none;
+  }
+  .pc-caption .label {
+    font-size: 8px;
+  }
+  .pc-back-intro {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-turn {
+    transition-duration: 0.01s;
+  }
+}
+
+/* ─── Case-study objects ──────────────────────────────────────────────── */
+
+.case-object {
+  padding-top: clamp(96px, 12vw, 180px);
+}
+
+/* The folded letterhead is a cut-out: shadow and light follow the paper itself. */
+.sheet.is-cutout {
+  box-shadow: none;
+  filter: drop-shadow(0 calc(4px + var(--lift) * 30px) calc(6px + var(--lift) * 28px) rgba(0, 0, 0, calc(0.22 + var(--lift) * 0.12)));
+  transition:
+    transform 0.5s var(--ease-out),
+    filter 0.5s var(--ease-out);
+}
+
+.sheet.is-cutout .sheet-light {
+  -webkit-mask: var(--sheet-src) center / contain no-repeat;
+  mask: var(--sheet-src) center / contain no-repeat;
+}
+
+/* Two-sided objects */
+.flip-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: clamp(420px, 50vw, 680px);
+  max-height: calc(100svh - 220px);
+  min-height: 380px;
+  perspective: 1600px;
+  container-type: size;
+}
+
+.flip-object {
+  --ry: 0deg;
+  --sway: 0deg;
+  --tilt: 0deg;
+  --glance: 0;
+  position: relative;
+  width: min(78cqw, 640px);
+  transform-style: preserve-3d;
+  transform: rotateZ(var(--sway)) rotateX(var(--tilt));
+  transform-origin: 50% 0;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.flip-object:active {
+  cursor: grabbing;
+}
+
+.is-hang .flip-object {
+  width: auto;
+  height: 74cqh;
+  margin-top: 8cqh;
+}
+
+.flip-turn {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--ry));
+}
+
+.flip-face {
+  position: relative;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.15),
+    0 2px 3px rgba(0, 0, 0, 0.18),
+    0 24px 40px -16px rgba(0, 0, 0, 0.35);
+}
+
+.is-hang .flip-face {
+  border-radius: 3px;
+  height: 100%;
+}
+
+.flip-face.is-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+.flip-face img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.is-hang .flip-face img {
+  width: auto;
+  height: 100%;
+}
+
+/* Card-stock tooth and a glance of light as the object turns. */
+.flip-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, calc(var(--glance) * 0.45)) 50%, transparent 75%),
+    var(--grain) 0 0 / 256px;
+  mix-blend-mode: soft-light;
+}
+
+.flip-hole {
+  position: absolute;
+  left: 50%;
+  top: 4.5%;
+  width: 5%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.flip-string {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  height: calc(8cqh + 74cqh * 0.06);
+  background: linear-gradient(#8a8680, #5d5a55);
+  transform-origin: 50% 0;
+}
+
+/* Garza: the painting on a gallery wall */
+.gallery-wall {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  padding: clamp(56px, 8vw, 110px) 16px clamp(40px, 6vw, 80px);
+  background:
+    radial-gradient(ellipse 46% 38% at 50% 8%, rgba(255, 244, 222, 0.55), rgba(255, 244, 222, 0) 70%),
+    linear-gradient(#e9e6df, #dcd8d0);
+  overflow: hidden;
+}
+
+/* A brass picture light on its arm */
+.gallery-light {
+  position: absolute;
+  top: clamp(18px, 3vw, 40px);
+  left: 50%;
+  width: 150px;
+  height: 14px;
+  translate: -50% 0;
+  border-radius: 7px;
+  background: linear-gradient(#cdb27a, #8c6f38 60%, #6d5427);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+.gallery-light::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  width: 4px;
+  height: 42px;
+  translate: -50% 0;
+  background: linear-gradient(90deg, #6d5427, #b89a5e, #6d5427);
+}
+
+/* Black float frame, white mat, the painting set in with a hairline shadow */
+.gallery-frame {
+  width: min(78%, 520px);
+  padding: 14px;
+  background: linear-gradient(135deg, #2a2927, #0e0e0d 45%, #1b1a19);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 2px 1px rgba(255, 255, 255, 0.12),
+    0 2px 3px rgba(0, 0, 0, 0.25),
+    0 28px 40px -14px rgba(0, 0, 0, 0.45);
+}
+.gallery-mat {
+  padding: clamp(22px, 7%, 46px);
+  background: #fbfaf7;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.18);
+}
+.gallery-art {
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: zoom-in;
+}
+.gallery-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-loupe {
+  position: absolute;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-color: #111;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 5px #1a1a19,
+    0 0 0 6px rgba(255, 255, 255, 0.4),
+    0 16px 30px rgba(0, 0, 0, 0.45),
+    inset 0 0 18px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+
+.gallery-plaque {
+  display: grid;
+  gap: 2px;
+  justify-self: end;
+  margin-right: max(0px, calc(50% - 360px));
+  max-width: 220px;
+  padding: 10px 12px;
+  background: #fbfaf7;
+  font-size: 12px;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.gallery-close {
+  position: relative;
+}
+.gallery-back {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  padding: 8px 12px;
+  background: #fbfaf7;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width: 719px) {
+  .gallery-frame {
+    width: 88%;
+    padding: 9px;
+  }
+  .gallery-plaque {
+    justify-self: center;
+    margin: 0;
+  }
+}
+
+/* Painting */
+.painting-frame {
+  position: relative;
+  height: clamp(460px, 64vw, 900px);
+  max-height: calc(100svh - 200px);
+  overflow: hidden;
+  background: #efeeea;
+  cursor: zoom-in;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.painting-frame:not(.is-fitted) {
+  cursor: grab;
+}
+
+.painting-frame:not(.is-fitted):active {
+  cursor: grabbing;
+}
+
+.painting-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.painting-map {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 92px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.painting-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.painting-map span {
+  position: absolute;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.text-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  text-decoration: none;
+}
+
+/* Arc88 plate */
+.plate-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 5vw, 72px) 0;
+  cursor: crosshair;
+}
+
+.plate-svg {
+  width: min(100%, 680px);
+  height: auto;
+}
+
+.plate-behind {
+  transition: x 0.6s var(--ease-out), y 0.6s var(--ease-out);
+}
+
+/* ─── Polaroids (the studio drawer) ─────────────────────────────────────
+   The scans sit slightly askew in their files, so the shadow follows the
+   paper (drop-shadow on the image), never the file's rectangle. */
+
+.polaroid .pola-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  opacity: var(--fade);
+}
+
+.pola-front img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3))
+    drop-shadow(0 calc(3px + var(--lift) * 20px) calc(4px + var(--lift) * 14px) rgba(0, 0, 0, calc(0.36 + var(--lift) * 0.12)));
+}
+
+.pola-sheen {
+  position: absolute;
+  inset: 3%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.28) 48%, transparent 64%);
+  opacity: calc(var(--lift) * 0.9);
+  pointer-events: none;
+}
+
+/* Name and role, set on the white strip below the picture. */
+.pola-caption {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  bottom: 6.5%;
+  display: grid;
+  gap: 3px;
+  pointer-events: none;
+  color: var(--ink);
+}
+
+.pola-caption-name {
+  font-weight: 700;
+  font-size: calc(var(--pw, 240px) * 0.066);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pola-caption-role {
+  font-size: calc(var(--pw, 240px) * 0.034) !important;
+  color: var(--ink-2);
+}
+
+/* The back: matte, light card. */
+.pola-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+  inset: 2% 1.5% !important;
+  padding: 11% 10%;
+  border-radius: 2px;
+  color: var(--ink);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.04)),
+    var(--grain) 0 0 / 220px,
+    #e7e5df;
+  background-blend-mode: normal, soft-light, normal;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 calc(3px + var(--lift) * 20px) calc(4px + var(--lift) * 14px) rgba(0, 0, 0, calc(0.36 + var(--lift) * 0.12));
+}
+
+.pola-name {
+  font-weight: 700;
+  font-size: calc(var(--pw, 240px) * 0.085);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.pola-role {
+  font-size: calc(var(--pw, 240px) * 0.036) !important;
+  color: var(--ink-2);
+}
+
+.pola-tags {
+  margin: 8% 0 0;
+  padding: 8% 0 0;
+  border-top: 1px solid rgba(12, 12, 12, 0.18);
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: calc(var(--pw, 240px) * 0.04) !important;
+}
+
+.pola-line {
+  margin-top: auto;
+  font-size: calc(var(--pw, 240px) * 0.05);
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.pola-button {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: inherit;
+  transform: translateZ(2px);
+}
+
+.pola-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+/* ─── Drawer fronts read as buttons ────────────────────────────────────── */
+
+.pull-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.pull-hint {
+  font-size: 10px;
+  color: var(--muted);
+  opacity: 0.8;
+  transition: color 0.25s, opacity 0.25s;
+}
+
+.pull-arrow {
+  display: inline-block;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.drawer[data-peek] .pull-hint,
+.drawer-front:focus-visible .pull-hint {
+  color: var(--ink);
+  opacity: 1;
+}
+
+.drawer[data-peek] .pull-arrow {
+  transform: translateY(3px);
+}
+
+.drawer[data-peek] .pull {
+  background: linear-gradient(to bottom, #6a6962 0%, #34332f 45%, #1c1b19 100%);
+}
+
+.drawer[data-peek] .label-holder {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.drawer-front {
+  cursor: pointer;
+}
+
+/* ─── Header: coffee count ─────────────────────────────────────────────── */
+
+.top-right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.coffee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coffee-cup {
+  width: 30px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.coffee-cup svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+.coffee-cup svg.is-bumped {
+  animation: coffee-bump 0.5s var(--ease-out);
+}
+
+.coffee-steam {
+  opacity: 0;
+}
+
+.coffee-cup:hover .coffee-steam,
+.coffee-cup svg.is-bumped .coffee-steam {
+  opacity: 1;
+  animation: steam 1.2s ease-out;
+}
+
+@keyframes coffee-bump {
+  30% {
+    transform: rotate(-8deg) translateY(-2px);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes steam {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.coffee-count {
+  display: grid;
+  line-height: 1.1;
+}
+
+.coffee-num {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.coffee-count .label {
+  font-size: 9.5px;
+}
+
+.coffee-undo {
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font-size: 9.5px;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.coffee:hover .coffee-undo,
+.coffee-undo:focus-visible {
+  opacity: 1;
+}
+
+@media (max-width: 719px) {
+  .coffee-count .label {
+    display: none;
+  }
+  .top-right {
+    gap: 12px;
+  }
+}
+
+/* ─── Loose things in the drawers ──────────────────────────────────────── */
+
+.loose {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  touch-action: none;
+  cursor: grab;
+  transform-style: preserve-3d;
+}
+
+.loose:active {
+  cursor: grabbing;
+}
+
+.loose.is-toy {
+  cursor: pointer;
+}
+
+.prop-svg,
+.tool-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 calc(1.5px + var(--lift) * 12px) calc(1.5px + var(--lift) * 10px) rgba(0, 0, 0, 0.5));
+}
+
+.loose.stain {
+  pointer-events: none !important;
+  cursor: default;
+}
+
+.coffee-ring {
+  display: block;
+}
+
+.loose:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+/* A pen in hand is off the floor entirely. */
+.tool.is-held {
+  visibility: hidden;
+}
+
+.held-tool {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(-10px 14px 8px rgba(0, 0, 0, 0.35));
+}
+
+.drawer-index.is-holding .drawer-stage {
+  cursor: none;
+}
+
+/* Spinning top: a wobble while it spins. */
+.prop-top.is-spinning .prop-svg {
+  animation: wobble 0.18s linear infinite;
+}
+
+@keyframes wobble {
+  50% {
+    transform: translate(1px, -1px);
+  }
+}
+
+/* Fortune slip */
+/* The slip stays readable however the cookie is lying. */
+.fortune {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max-content;
+  max-width: 230px;
+  padding: 7px 10px;
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--r, 0deg) - 3deg)) translateY(62px);
+  background: #fbfaf5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.35;
+  color: #7a2a1f;
+  text-align: center;
+  pointer-events: none;
+  animation: slip 0.5s var(--ease-out);
+}
+
+@keyframes slip {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Bubble wrap: a sheet of clear bubbles you can pop. */
+.bubblewrap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3%;
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.bubble {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.25) 45%, rgba(255, 255, 255, 0.08) 70%);
+  box-shadow:
+    inset 0 -2px 3px rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+
+.bubble:hover {
+  transform: scale(1.06);
+}
+
+.bubble.is-popped {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  transform: scale(0.8);
+  cursor: default;
+  animation: popped 0.2s ease-out;
+}
+
+@keyframes popped {
+  from {
+    transform: scale(1.15);
+  }
+}
+
+/* ─── The sketch pad ───────────────────────────────────────────────────── */
+
+.loose.pad {
+  cursor: grab;
+}
+
+.pad-under {
+  position: absolute;
+  inset: 0;
+  background: #eceae4;
+  box-shadow:
+    1.5px 2px 0 #dcdad3,
+    3px 4px 0 #d3d1ca,
+    0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+.pad-sheet {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  background:
+    var(--grain) 0 0 / 256px,
+    #fbfaf6;
+  background-blend-mode: soft-light, normal;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  transition: clip-path 0.25s var(--ease-out);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+}
+
+/* The corner lifts: the sheet is cut back and a curl shows its underside. */
+.pad-sheet.is-peeling {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+}
+
+.pad-curl {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  opacity: 0;
+  background: linear-gradient(315deg, transparent 50%, #f3f1ea 50%, #dedcd5 100%);
+  filter: drop-shadow(-2px -2px 2px rgba(0, 0, 0, 0.18));
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.pad-sheet.is-peeling .pad-curl {
+  opacity: 1;
+  right: 30px;
+  bottom: 30px;
+  transform: rotate(180deg);
+  transform-origin: 100% 100%;
+}
+
+.pad-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  touch-action: none;
+}
+
+.pad-canvas.is-live {
+  cursor: none;
+}
+
+.pad-corner {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  z-index: 2;
+}
+
+.pad-corner:focus-visible {
+  outline: 2px solid var(--ink);
+}
+
+/* The tin's lid rolls back; the ring travels with it. */
+.tin-lid,
+.tin-ring {
+  transition: transform 0.9s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.tin-roll {
+  transition: opacity 0.3s 0.5s;
+}
+
+/* Office Polaroids: a plain photo, framed as instant film in code. */
+.office-front {
+  padding: 6% 6% 22%;
+  background:
+    var(--grain) 0 0 / 200px,
+    #f6f5f0;
+  background-blend-mode: soft-light, normal;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 1px 1px rgba(0, 0, 0, 0.3),
+    0 calc(3px + var(--lift) * 20px) calc(4px + var(--lift) * 14px) rgba(0, 0, 0, calc(0.36 + var(--lift) * 0.12));
+}
+
+.office-front video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.office-front img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85) contrast(0.95);
+  pointer-events: none;
+}
+
+.office-back {
+  justify-content: flex-end;
+}
+
+/* An empty slot: undeveloped film, waiting for its photo. */
+.office-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 8%;
+  background: linear-gradient(160deg, #3a3936, #1f1e1c);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 9px;
+  pointer-events: none;
+}
+
+/* ─── Molly: stamps and envelope ───────────────────────────────────────── */
+
+.stamp-stage {
+  position: relative;
+  height: clamp(460px, 48vw, 620px);
+  background: #f2efe8;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stamp-envelope {
+  position: absolute;
+  left: 6%;
+  top: 50%;
+  width: min(52%, 560px);
+  height: auto;
+  translate: 0 -50%;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+.stamp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  transition: transform 0.35s var(--ease-out), filter 0.2s;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.22));
+}
+
+.stamp img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.stamp.is-lifted {
+  cursor: grabbing;
+  filter: drop-shadow(0 16px 14px rgba(0, 0, 0, 0.28));
+}
+
+.stamp.is-stuck {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+  animation: stick 0.3s var(--ease-out);
+}
+
+@keyframes stick {
+  40% {
+    scale: 0.94;
+  }
+}
+
+.postmark {
+  position: absolute;
+  width: min(30%, 300px);
+  height: auto;
+  color: rgba(20, 20, 30, 0.72);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 999;
+  animation: frank 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+@keyframes frank {
+  from {
+    opacity: 0;
+    scale: 1.2;
+  }
+}
+
+/* The letter overlay sits exactly on the envelope image (same box). */
+.stamp-letter {
+  position: absolute;
+  left: 6%;
+  top: 50%;
+  width: min(52%, 560px);
+  aspect-ratio: 600 / 545;
+  translate: 0 -50%;
+  pointer-events: none;
+  z-index: 1;
+}
+.stamp-stage.is-writing .stamp-letter {
+  z-index: 998;
+}
+.stamp-stage.is-writing .stamp-letter-hit {
+  pointer-events: all;
+  cursor: none;
+}
+.stamp-stage.is-writing .stamp {
+  cursor: default;
+}
+
+.stamp-pencil {
+  position: absolute;
+  left: 9%;
+  bottom: 22px;
+  width: 190px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  rotate: -4deg;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+  transition: translate 0.2s var(--ease-out);
+  z-index: 2;
+}
+.stamp-pencil:hover {
+  translate: 0 -3px;
+}
+.stamp-pencil .tool-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 719px) {
+  .stamp-stage {
+    height: 620px;
+  }
+  .stamp-envelope,
+  .stamp-letter {
+    left: 50%;
+    top: 30%;
+    width: 80%;
+    translate: -50% -50%;
+  }
+  .stamp-pencil {
+    left: auto;
+    right: 16px;
+    bottom: auto;
+    top: 8px;
+    width: 140px;
+    height: 12px;
+  }
+}
+
+/* ─── Runway: boarding pass ────────────────────────────────────────────── */
+
+.pass-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 6vw, 90px) 0;
+  perspective: 1800px;
+  touch-action: none;
+}
+
+.pass {
+  position: relative;
+  width: min(92%, 980px);
+}
+
+.pass-turn {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s var(--ease-out);
+}
+
+.pass-turn.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.pass-piece {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.pass-piece:first-child {
+  position: relative;
+}
+
+/* Each side of each piece: its shadow is drawn from the clipped paper inside. */
+.pass-face {
+  display: block;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.14)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+}
+
+.pass-piece:not(:first-child) .pass-face,
+.pass-face.is-back {
+  position: absolute;
+  inset: 0;
+}
+
+.pass-face.is-back {
+  transform: rotateY(180deg);
+}
+
+.pass-paper {
+  position: relative;
+  transition: clip-path 0.3s var(--ease-out);
+}
+
+.pass-paper img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Card stock: grain in the fibres, and a soft bevel where light catches the cut edge. */
+.pass-paper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--grain) 0 0 / 420px auto;
+  mix-blend-mode: multiply;
+  opacity: 0.16;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 1px 0 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.14),
+    inset -1px 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* The dog-ear: the corner folded over onto the pass, showing the paper's back. */
+.pass-fold {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: drop-shadow(1px -1px 1.5px rgba(0, 0, 0, 0.2));
+  transition: width 0.3s var(--ease-out), height 0.3s var(--ease-out);
+}
+
+.pass-fold span {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  background:
+    linear-gradient(45deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0) 55%),
+    #f3f1eb;
+}
+
+.pass-fold.is-right {
+  left: auto;
+  right: 0;
+}
+
+.pass-fold.is-right span {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background:
+    linear-gradient(-45deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0) 55%),
+    #f3f1eb;
+}
+
+.pass-fold:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.pass-stub {
+  cursor: grab;
+}
+
+.pass-stub:active {
+  cursor: grabbing;
+}
+
+.pass-stub .pass-face {
+  pointer-events: auto;
+}
+
+.pass-stub.is-torn .pass-face {
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.14)) drop-shadow(0 16px 18px rgba(0, 0, 0, 0.18));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass-paper,
+  .pass-fold {
+    transition: none;
+  }
+}
+
+/* ─── Lex: wax seal ────────────────────────────────────────────────────── */
+
+.seal-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 4vw, 60px) 0;
+}
+
+.seal-letter {
+  position: relative;
+  height: min(76vh, 760px);
+  cursor: crosshair;
+}
+
+.seal-letter {
+  height: auto;
+  width: min(86%, 760px);
+}
+
+.seal-envelope {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12)) drop-shadow(0 18px 24px rgba(0, 0, 0, 0.16));
+  pointer-events: none;
+}
+
+.seal-letter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: var(--grain) 0 0 / 420px auto;
+  mix-blend-mode: multiply;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.seal-letter .wax {
+  z-index: 1;
+}
+
+.wax {
+  position: absolute;
+  width: min(22%, 150px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+}
+
+.wax svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.wax-pool {
+  transform-origin: 50px 50px;
+  transform-box: view-box;
+  animation: pour 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes pour {
+  from {
+    transform: scale(0.15);
+  }
+}
+
+.wax .wax-mark,
+.wax .wax-well {
+  opacity: 0;
+}
+
+.wax.is-press .wax-mark,
+.wax.is-pressed .wax-mark,
+.wax.is-press .wax-well,
+.wax.is-pressed .wax-well {
+  opacity: 1;
+}
+
+.wax.is-press svg {
+  animation: press 0.34s var(--ease-out);
+}
+
+@keyframes press {
+  40% {
+    transform: scale(0.94);
+  }
+  70% {
+    transform: scale(1.04);
+  }
+}
+
+/* ─── Soft Hours: the dial ─────────────────────────────────────────────── */
+
+.dial-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 6vw, 90px) 0;
+  background: #fff9eb; /* Soft Hours Linen */
+}
+
+.dial {
+  width: min(62%, 420px);
+  height: auto;
+}
+
+.dial-diamond {
+  transition: transform 0.25s var(--ease-out);
+}
+
+/* ─── Tagawa: rose bed ─────────────────────────────────────────────────── */
+
+.rose-bed {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rose-bed:focus-visible {
+  outline: 2px solid #224526;
+  outline-offset: -2px;
+}
+
+.rose {
+  animation: sway 5.5s ease-in-out infinite alternate;
+}
+
+.rose-bed.is-still .rose {
+  animation: none;
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(calc(var(--sway) * -1));
+  }
+  to {
+    transform: rotate(var(--sway));
+  }
+}
+
+.rose.is-new .rose-stem {
+  stroke-dasharray: 1;
+  animation: grow-stem 0.9s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+
+.rose.is-new .rose-leaf {
+  animation: unfurl 0.5s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+}
+
+.rose.is-new .rose-head {
+  animation: bloom 0.6s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s both;
+}
+
+@keyframes grow-stem {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes unfurl {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+
+/* ─── Arc88: drilling the plate ────────────────────────────────────────── */
+
+.plate-stage {
+  cursor: crosshair;
+}
+
+.plate-stage.is-done {
+  cursor: default;
+}
+
+.hole-opening {
+  animation: hole-open ease-in both;
+}
+
+@keyframes hole-open {
+  from {
+    transform: scale(0.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.drill-bit {
+  animation: spin linear both;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: rotate(1440deg);
+    opacity: 0;
+  }
+}
+
+.swarf {
+  animation: swarf 0.7s ease-out both;
+}
+
+@keyframes swarf {
+  from {
+    opacity: 0;
+    stroke-dasharray: 0 400;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    stroke-dasharray: 260 400;
+  }
+}
+
+/* ─── Garza: border and lantern ────────────────────────────────────────── */
+
+.charro-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.charro {
+  width: 100%;
+  height: 100%;
+}
+
+.charro rect {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.charro.is-drawn rect {
+  opacity: 1;
+}
+
+.lantern {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 9, 5, 0.93);
+  -webkit-mask: radial-gradient(circle at var(--lx, 50%) var(--ly, 50%), transparent 0, transparent 70px, #000 210px);
+  mask: radial-gradient(circle at var(--lx, 50%) var(--ly, 50%), transparent 0, transparent 70px, #000 210px);
+  pointer-events: none;
+  animation: dusk 0.6s ease-out;
+}
+
+@keyframes dusk {
+  from {
+    opacity: 0;
+  }
+}
+
+.painting-frame.is-lantern {
+  cursor: none;
+}
+
+/* ─── The rooms: cabinet, fridge, vending machine, typewriter, side by side ── */
+
+.room {
+  position: absolute;
+  inset: 0;
+  width: 400%;
+  display: flex;
+  transform: translate(calc(var(--room, 0) * -25%), 0) scale(1);
+  transform-origin: 0 0;
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+/* The overview: the four objects themselves, side by side on one floor.
+   Each room panel is moved and scaled (--ox, --oy, --ok, measured in JS) so its
+   object lands on its spot; the track itself stays put. */
+.room > * {
+  transform-origin: 0 0;
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.25, 1);
+}
+.room.is-overview {
+  transform: translate(0%, 0%) scale(1);
+  pointer-events: none;
+}
+/* No clipping or fading on the rooms here: either would flatten their 3D (doors
+   and drawers would show what's behind them). Until laid out, they're just hidden. */
+.room.is-overview > * {
+  overflow: visible !important;
+  visibility: hidden;
+}
+.room.is-overview.is-laid > * {
+  visibility: visible;
+  transform: translate(var(--ox), calc(var(--oy) + var(--rise, 0px))) scale(calc(var(--ok) * var(--sx, 1)), var(--ok)) !important;
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--i, 0) * 80ms);
+}
+/* Waiting below the floor: placed instantly, then released to slide up. */
+.room.is-overview.is-rising > * {
+  --rise: 105vh;
+  transition: none !important;
+}
+/* A shared floor line under them. */
+.overview::after {
+  content: '';
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: var(--floor, 80%);
+  height: 1px;
+  background: var(--rule);
+}
+
+.overview {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+.overview-title {
+  position: absolute;
+  left: 3%;
+  top: 14%;
+  margin: 0;
+  font-size: clamp(36px, 6vw, 84px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-weight: inherit;
+  animation: overview-in 0.6s var(--ease-out) both;
+}
+.overview-room {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: zoom-in;
+  color: inherit;
+  transition: background-color 0.25s, box-shadow 0.25s;
+}
+.overview-room:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 8px;
+}
+.overview-room:hover .overview-name {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.overview-label {
+  position: absolute;
+  left: 50%;
+  width: max(100%, 170px);
+  translate: -50% 0;
+  top: calc(100% + 16px);
+  display: grid;
+  gap: 4px;
+  text-align: center;
+  justify-items: center;
+  animation: overview-in 0.6s var(--ease-out) calc(0.1s + var(--i) * 0.06s) both;
+}
+.overview-name {
+  font-size: clamp(15px, 1.6vw, 22px);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+.overview-what {
+  font-size: 13px;
+  line-height: 1.35;
+  opacity: 0.6;
+}
+@keyframes overview-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (max-width: 719px) {
+  .overview-what {
+    display: none;
+  }
+  .overview-name {
+    font-size: 12px;
+  }
+  .overview-title {
+    top: 18%;
+  }
+}
+
+.room.is-jump,
+.room.is-jump > * {
+  transition: none !important;
+}
+
+.room > * {
+  position: relative;
+  width: 25%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.room-cabinet {
+  overflow: visible !important;
+  perspective: 1700px;
+  perspective-origin: 50% 50%;
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+/* A touch of parallax as the view pans past. */
+.room:not(.is-cabinet) .room-cabinet {
+  transform: translateX(-8%);
+}
+
+.room-soon {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+/* Room links in the header */
+.room-nav {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.room-link {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.55;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.room-link:hover {
+  opacity: 1;
+}
+
+.room-link[aria-current] {
+  opacity: 1;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+button.contact {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+button.contact:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.room-nav.is-mobile {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .index-top .room-nav {
+    display: none;
+  }
+  .room-nav.is-mobile {
+    display: flex;
+    position: fixed;
+    left: 50%;
+    top: 72px;
+    translate: -50% 0;
+    z-index: 30;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(251, 251, 249, 0.96);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+  }
+  .room-link {
+    padding: 0 9px;
+  }
+}
+
+/* ─── The entrance ─────────────────────────────────────────────────────── */
+
+.entrance {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 32px 16px;
+  background: var(--paper);
+}
+
+.entrance::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--grain) 0 0 / 420px auto;
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.entrance-inner {
+  position: relative;
+  outline: none;
+}
+
+@keyframes entrance-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.entrance-inner {
+  width: min(1100px, 100%);
+  display: grid;
+  gap: 18px;
+}
+
+.entrance-title {
+  margin: 0 0 clamp(12px, 3vw, 36px);
+  font-size: clamp(44px, 8vw, 112px);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-weight: inherit;
+}
+
+.entrance-rooms {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entrance-room {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  padding: 16px 16px 18px;
+  text-align: left;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.55);
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), background-color 0.25s;
+}
+
+.entrance-room svg {
+  width: min(120px, 60%);
+  height: auto;
+  justify-self: center;
+  align-self: center;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.entrance-room:hover,
+.entrance-room:focus-visible {
+  background: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.35);
+}
+
+.entrance-room:hover svg {
+  transform: scale(1.05);
+}
+
+.entrance-room-title {
+  font-size: clamp(20px, 2vw, 26px);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.entrance-room-what {
+  font-size: 14px;
+  line-height: 1.35;
+  opacity: 0.65;
+}
+
+@media (max-width: 899px) {
+  .entrance-rooms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .entrance-room {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 420px) {
+  .entrance-room {
+    min-height: 170px;
+    padding: 12px;
+  }
+  .entrance-room svg {
+    width: 70px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .room,
+  .room-cabinet,
+  .entrance {
+    transition: none;
+    animation: none;
+  }
+}
+
+.fridge-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fridge-view.is-panning {
+  cursor: grabbing;
+}
+
+.fridge-cam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.fridge-cam.is-smooth {
+  transition: transform 0.6s var(--ease-out);
+}
+
+/* White enamel, lit from the left; freezer above, door below. */
+.fridge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 34px 34px 20px 20px;
+  background: linear-gradient(90deg, #d4d3ce, #f2f1ed 8%, #fbfbf8 46%, #eeede8 90%, #cbcac5);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 60px 80px -50px rgba(0, 0, 0, 0.45);
+}
+
+.fridge-freezer,
+.fridge-door {
+  position: relative;
+  flex: none;
+  border-radius: 28px 28px 8px 8px;
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0.75) 42%, rgba(255, 255, 255, 0) 56%),
+    var(--grain) 0 0 / 300px,
+    linear-gradient(180deg, #fdfdfb, #f0efea);
+  background-blend-mode: normal, soft-light, normal;
+  box-shadow:
+    inset 0 2px 0 #fff,
+    inset 0 -3px 5px rgba(0, 0, 0, 0.06),
+    0 2px 3px rgba(0, 0, 0, 0.12);
+}
+
+.fridge-door {
+  flex: 1;
+  border-radius: 8px 8px 16px 16px;
+}
+
+.fridge-handle {
+  position: absolute;
+  left: 26px;
+  bottom: 30px;
+  width: 20px;
+  height: 42%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #7f807c, #f4f4f1 38%, #a9aaa6 70%, #62635f);
+  box-shadow: 6px 8px 10px rgba(0, 0, 0, 0.22);
+}
+
+.fridge-handle.is-long {
+  top: 30px;
+  bottom: auto;
+  height: 34%;
+}
+
+.fridge-grille {
+  flex: none;
+  height: 54px;
+  border-radius: 0 0 14px 14px;
+  background: repeating-linear-gradient(90deg, #2a2a28 0 6px, #4a4a47 6px 12px);
+  opacity: 0.85;
+}
+
+/* Magnets: die-cut to the mark, a few millimetres of black rubber off the door.
+   The shadow and the sheen both follow the mark's own shape. */
+.magnet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  filter: drop-shadow(0.5px 1px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.24));
+  transition: filter 0.2s;
+}
+
+.magnet img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* A little light catching the edge of the cut. */
+.magnet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 42%);
+  -webkit-mask: var(--mark) center / contain no-repeat;
+  mask: var(--mark) center / contain no-repeat;
+  pointer-events: none;
+}
+
+.magnet.is-lifted {
+  cursor: grabbing;
+  filter: drop-shadow(0.5px 1px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 14px 12px rgba(0, 0, 0, 0.3));
+}
+
+.magnet:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 5px;
+}
+
+.magnet.is-wobbling {
+  animation: wobble-magnet 0.45s ease-in-out;
+}
+
+@keyframes wobble-magnet {
+  25% {
+    translate: 0 -3px;
+  }
+  60% {
+    translate: 0 1px;
+  }
+}
+
+.magnet-tip {
+  position: absolute;
+  translate: -50% 0;
+  padding: 5px 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fridge-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(231, 231, 229, 0.92);
+  z-index: 6;
+}
+
+/* ─── Lex: pixel treatment ─────────────────────────────────────────────── */
+
+.pix-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 3vw, 40px);
+  background: #0b0b0b;
+}
+
+.pix-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: min(72vh, 720px);
+  width: auto;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.pix-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px 28px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.12));
+}
+
+.pix-photos {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+
+.pix-thumb {
+  display: grid;
+  gap: 4px;
+  width: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  opacity: 0.5;
+  text-align: left;
+}
+.pix-thumb img {
+  width: 64px;
+  height: 44px;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+.pix-thumb[aria-pressed='true'] {
+  opacity: 1;
+}
+.pix-thumb[aria-pressed='true'] img {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.pix-sliders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.pix-slider {
+  display: grid;
+  gap: 6px;
+}
+.pix-slider b {
+  font-weight: 400;
+  opacity: 0.55;
+}
+.pix-slider input {
+  width: 100%;
+  accent-color: var(--ink);
+}
+
+.pix-toggles {
+  display: flex;
+  gap: 14px;
+}
+
+@media (max-width: 899px) {
+  .pix-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pix-sliders {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ─── Studio photo, up close ───────────────────────────────────────────── */
+
+.photo-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 72px 16px;
+  background: rgba(24, 23, 21, 0.62);
+  cursor: zoom-out;
+  animation: zoom-dim 0.4s var(--ease-out) both;
+}
+
+.photo-zoom.is-closing {
+  animation: zoom-undim 0.4s var(--ease-out) both;
+}
+
+@keyframes zoom-dim {
+  from {
+    background: rgba(24, 23, 21, 0);
+  }
+}
+@keyframes zoom-undim {
+  to {
+    background: rgba(24, 23, 21, 0);
+  }
+}
+
+/* A Polaroid: even white border, deeper at the foot. */
+.photo-zoom-card {
+  --h: min(calc(100vh - 150px - 11.5vmin), calc((100vw - 32px - 5vmin) / var(--ar)));
+  width: calc(var(--h) * var(--ar) + 5vmin);
+  padding: 2.5vmin 2.5vmin 9vmin;
+  background:
+    var(--grain) 0 0 / 300px,
+    #f6f5f0;
+  background-blend-mode: soft-light, normal;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.42s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.photo-zoom-card img,
+.photo-zoom-card video {
+  display: block;
+  width: 100%;
+  height: var(--h);
+  object-fit: cover;
+  background: #111;
+}
+
+.photo-zoom-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-zoom,
+  .photo-zoom.is-closing {
+    animation: none;
+  }
+  .photo-zoom-card {
+    transition: none;
+  }
+}
+
+.sound-toggle {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+}
+.sound-toggle:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.06);
+}
+.sound-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+.sound-toggle[aria-pressed='false'] {
+  opacity: 0.45;
+}
+
+/* ─── Specimens drawer: colour chips and mark specimens ────────────────── */
+
+.chip .pola-face,
+.specimen .pola-face {
+  border-radius: 3px;
+  overflow: hidden;
+  background:
+    var(--grain) 0 0 / 220px,
+    #f7f6f1;
+  background-blend-mode: soft-light, normal;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 1px 1px rgba(0, 0, 0, 0.28),
+    0 calc(3px + var(--lift) * 20px) calc(4px + var(--lift) * 14px) rgba(0, 0, 0, calc(0.34 + var(--lift) * 0.12));
+}
+
+/* A paint chip: the colour, then the name and value on white. */
+.chip-front {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  padding: 7%;
+  gap: 2px;
+}
+.chip-colour {
+  display: block;
+  min-height: 0;
+  margin-bottom: 6%;
+  background: var(--ink-c);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.chip-name,
+.spec-name {
+  font-weight: 700;
+  font-size: calc(var(--pw) * 0.1);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.chip-hex {
+  font-size: calc(var(--pw) * 0.075) !important;
+  color: var(--ink-2);
+}
+
+/* A specimen card: the mark, large, in its colour. */
+.spec-front {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  align-items: center;
+  padding: 8% 9%;
+  text-align: center;
+}
+.spec-no {
+  justify-self: start;
+  font-size: calc(var(--pw) * 0.045) !important;
+  color: var(--ink-2);
+}
+.specimen .spec-name {
+  font-size: calc(var(--pw) * 0.075);
+}
+.spec-mark {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 70%;
+  max-height: 58%;
+  min-width: 30%;
+  -webkit-mask: var(--mark) center / contain no-repeat;
+  mask: var(--mark) center / contain no-repeat;
+}
+.specimen .spec-front .spec-mark {
+  width: 64%;
+}
+
+/* The back of either: name, value, and the way to the work. */
+.spec-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9%;
+}
+.spec-back .spec-mark {
+  width: 56%;
+  margin: 4% auto 8%;
+}
+.spec-back .chip-colour {
+  flex: 1;
+  margin: 0 0 8%;
+}
+.chip .spec-back .spec-name {
+  font-size: calc(var(--pw) * 0.09);
+}
+.spec-note {
+  font-size: calc(var(--pw) * 0.055) !important;
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+.spec-go {
+  position: relative;
+  z-index: 4;
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: calc(var(--pw) * 0.055) !important;
+  cursor: pointer;
+  transform: translateZ(3px);
+}
+.chip .spec-go {
+  font-size: calc(var(--pw) * 0.07) !important;
+}
+/* Turned over, the back takes the clicks (so its link works); a click elsewhere on it turns it back. */
+.pola-button.is-behind {
+  pointer-events: none;
+}
+.chip.is-flipped .spec-back,
+.specimen.is-flipped .spec-back {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.room.is-overview .fridge-controls,
+.room.is-overview .tw-actions,
+.room.is-overview .magnet-tip {
+  opacity: 0;
+}
+.overview.is-back .overview-title {
+  animation-delay: 0.9s;
+}
+.overview.is-back .overview-label {
+  animation-delay: calc(1s + var(--i) * 0.06s);
+}
+.overview.is-back .overview-room {
+  pointer-events: none;
+  animation: overview-ready 0s 1s forwards;
+}
+@keyframes overview-ready {
+  to {
+    pointer-events: auto;
+  }
+}
+
+/* Type cards: the typeface named, as on a specimen sheet. */
+.type-front {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9%;
+}
+.type-family {
+  margin-top: 10%;
+  font-weight: 700;
+  font-size: calc(var(--pw) * 0.13);
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--ink);
+}
+.type-meta {
+  font-size: calc(var(--pw) * 0.042) !important;
+  color: var(--ink-2);
+}
+.type-second {
+  margin-top: 6%;
+  font-size: calc(var(--pw) * 0.06);
+  line-height: 1.1;
+  color: var(--ink);
+}
+.type-line {
+  margin-top: auto;
+  padding-top: 6%;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: calc(var(--pw) * 0.052);
+  line-height: 1.25;
+  color: var(--ink-2);
+}
+.spec-palette {
+  display: flex;
+  gap: 3px;
+  margin: 2px 0 4px;
+}
+.spec-palette span {
+  flex: 1;
+  height: calc(var(--pw) * 0.07);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Overview set dressing: a plant on the cabinet, a desk for the typewriter. */
+.overview-props {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: overview-in 0.8s var(--ease-out) 0.3s both;
+}
+.overview.is-back ~ .overview-props,
+.drawer-stage:has(.overview.is-back) .overview-props {
+  animation-delay: 1s;
+}
+.ov-plant {
+  position: absolute;
+  overflow: visible;
+}
+.ov-desk {
+  position: absolute;
+}
+.ov-desk-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 7%;
+  min-height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(#b98a5e, #8d6340);
+  box-shadow: 0 2px 0 #6f4c30, 0 6px 10px -4px rgba(0, 0, 0, 0.35);
+}
+.ov-desk-leg {
+  position: absolute;
+  top: 9%;
+  bottom: 0;
+  width: 5%;
+  min-width: 4px;
+  background: linear-gradient(90deg, #7a5536, #9c7049 50%, #6d4a2f);
+}
+.ov-desk-leg.is-l {
+  left: 6%;
+}
+.ov-desk-leg.is-r {
+  right: 6%;
+}
+.room.is-overview .vm-dish,
+.room.is-overview .vm-coin-btn {
+  opacity: 0;
+}
+
+.brand-lockup {
+  display: block;
+  width: auto;
+  height: 19px;
+}
+
+/* Room links sit centred in the header. */
+.index-top .room-nav {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}
+
+/* Headings and names in the site's 75 Bold. */
+:where(h1, h2, h3),
+.overview-title,
+.overview-name,
+.spec-name,
+.chip-name,
+.type-family,
+.ix-name,
+.vm-card-title,
+.vm-sign-title {
+  font-weight: 700;
+}
+
+/* ─── The archive: index cards in a tray ───────────────────────────────── */
+
+.loose.tray {
+  cursor: default;
+}
+.ix-tray {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 6px;
+  background: linear-gradient(#3b3a37, #2c2b28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 10px 24px rgba(0, 0, 0, 0.5),
+    0 2px 3px rgba(0, 0, 0, 0.4),
+    0 18px 30px -12px rgba(0, 0, 0, 0.55);
+}
+.ix-well {
+  position: relative;
+  min-height: 0;
+  container-type: size;
+}
+.ix-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(100%, calc((100cqh) * 5 / 3));
+  aspect-ratio: 5 / 3;
+  height: auto;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 7% 7% 6%;
+  border-radius: 3px;
+  color: var(--ink);
+  /* A lined index card: a red head rule, faint blue rules below. */
+  background:
+    linear-gradient(transparent 0, transparent 17%, rgba(214, 72, 72, 0.55) 17%, rgba(214, 72, 72, 0.55) calc(17% + 1.5px), transparent calc(17% + 1.5px)),
+    repeating-linear-gradient(transparent 0 calc(10% - 1px), rgba(90, 130, 190, 0.22) calc(10% - 1px) 10%),
+    linear-gradient(170deg, #fbf9f2, #f1ede1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25), 0 6px 14px -6px rgba(0, 0, 0, 0.45);
+  text-align: left;
+}
+.ix-under {
+  transform: translate(calc(var(--d) * 3px), calc(var(--d) * -4px));
+  filter: brightness(calc(1 - var(--d) * 0.05));
+}
+.ix-top {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(100%, calc((100cqh) * 5 / 3));
+  aspect-ratio: 5 / 3;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.ix-top:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.ix-card-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-2);
+}
+.ix-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6%;
+  padding-top: 8%;
+}
+.ix-card-text {
+  display: grid;
+  gap: 10px;
+}
+.ix-name {
+  font-size: clamp(22px, 2.6vw, 38px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.ix-tags {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.ix-mark {
+  display: block;
+  width: clamp(60px, 7vw, 110px);
+  max-height: 110px;
+  -webkit-mask: var(--mark) center / contain no-repeat;
+  mask: var(--mark) center / contain no-repeat;
+}
+.ix-card-foot {
+  justify-self: end;
+}
+.ix-card.is-leaving {
+  z-index: 3;
+  animation: ix-leave 0.38s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+.ix-card.is-leaving.is-back {
+  animation-name: ix-leave-back;
+}
+@keyframes ix-leave {
+  to {
+    transform: translate(-6%, -60%) rotate(-4deg);
+    opacity: 0;
+  }
+}
+@keyframes ix-leave-back {
+  to {
+    transform: translate(6%, 40%) rotate(3deg);
+    opacity: 0;
+  }
+}
+.ix-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.ix-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+}
+.ix-tab,
+.ix-step {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 3px 3px 0 0;
+  background: #d9d2bf;
+  color: #3a3833;
+  cursor: pointer;
+}
+.ix-step {
+  border-radius: 999px;
+  min-width: 30px;
+  height: 30px;
+  background: #f8f6ee;
+}
+.ix-tab[aria-pressed='true'] {
+  background: #f8f6ee;
+  box-shadow: 0 -2px 0 #d64848 inset;
+}
+.ix-tab:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.ix-count {
+  margin: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ix-card.is-leaving {
+    animation: none;
+    display: none;
+  }
+}
+
+/* The narrower overview cabinet: keep its labels and handles their true shape. */
+.room.is-overview .room-cabinet .label-card {
+  transform: scaleX(calc(1 / var(--sx, 1)));
+}
+.room-cabinet .label-card {
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.25, 1);
+}
+.ov-frame {
+  position: absolute;
+  padding: 8px; /* a white mat (px: % padding would be taken from the whole stage's width) */
+  background: #fbfaf7;
+  border: 5px solid #1c1b19;
+  box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.4);
+}
+.ov-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.85);
+}
+
+/* Junk drawer toys */
+.prop-candle .prop-svg {
+  overflow: visible;
+}
+.candle-flame-body {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: flicker 0.18s ease-in-out infinite alternate;
+}
+@keyframes flicker {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.12, 0.86) skewY(2deg);
+  }
+}
+.prop-candle.is-lit {
+  filter: drop-shadow(0 0 10px rgba(255, 180, 80, 0.55));
+}
+.prop-band.is-snapping .prop-svg,
+.prop-band2.is-snapping .prop-svg {
+  animation: twang 0.26s ease-out;
+}
+@keyframes twang {
+  30% {
+    transform: scale(1.35, 0.7);
+  }
+  60% {
+    transform: scale(0.9, 1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .candle-flame-body,
+  .prop-band.is-snapping .prop-svg {
+    animation: none;
+  }
+}
+.ov-frame.is-small {
+  border-width: 3px;
+  padding: 5px;
+}
+
+/* The desk seen from a little above, like the typewriter on it: its top recedes. */
+.ov-desk-surface {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 22%;
+  background: linear-gradient(#a57a52, #c29466);
+  clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+}
+/* On the overview the typewriter stands straight on the desk: no mat, no floor shadow of its own. */
+.room.is-overview .tw-mat,
+.room.is-overview .tw-shadow {
+  opacity: 0;
+}
+
+/* ─── Notably: the highlighter ─────────────────────────────────────────── */
+
+.hl-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(40px, 7vw, 110px) clamp(16px, 6vw, 90px);
+  background: #f2f1ec;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.hl-text {
+  margin: 0;
+  max-width: 17ch;
+  font-size: clamp(34px, 5.6vw, 84px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-align: center;
+  color: #262624;
+}
+.hl-word,
+.hl-gap {
+  position: relative;
+  /* The highlight: a band of ink behind the letters, swiped left to right. */
+  background: linear-gradient(var(--hl), var(--hl)) no-repeat 0 60% / 0% 78%;
+  transition: background-size 0.28s cubic-bezier(0.3, 0, 0.2, 1);
+  mix-blend-mode: multiply;
+}
+.hl-word.is-lit,
+.hl-gap.is-lit {
+  background-size: 100% 78%;
+}
+.hl-word.is-start {
+  border-radius: 3px 0 0 3px;
+  padding-left: 0.08em;
+  margin-left: -0.08em;
+}
+.hl-word.is-end {
+  border-radius: 0 3px 3px 0;
+  padding-right: 0.08em;
+  margin-right: -0.08em;
+}
+.hl-word.is-fresh {
+  transition-duration: 0.36s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hl-word,
+  .hl-gap {
+    transition: none;
+  }
+}
+.type-front.has-aa img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 52%;
+  margin: auto 0;
+  object-fit: contain;
+  pointer-events: none;
+}
+.type-aa-name {
+  font-weight: 700;
+  font-size: calc(var(--pw) * 0.075);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: var(--ink);
+}
