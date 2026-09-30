@@ -249,6 +249,28 @@ const SOUNDS = {
     tone({ t: 0.34, f: 140, f2: 90, dur: 0.1, vol: 0.2 })
   },
   paperOut: () => sample('paperOut', { vol: 0.5 }) || noise({ dur: 0.6, type: 'bandpass', f: 900, f2: 2800, q: 0.8, vol: 0.12, a: 0.05 }),
+  // Home page: hovering each object
+  rustle: () => {
+    // a few sheets of paper shuffled
+    for (let i = 0; i < 4; i++) noise({ t: i * 0.05 + Math.random() * 0.02, dur: 0.09, type: 'bandpass', f: jitter(2600, 0.3), q: 0.8, vol: 0.07, a: 0.01 })
+  },
+  bottles: () => {
+    // two glass bottles knocking together in a door bin
+    const f = jitter(2300, 0.1)
+    tone({ f, dur: 0.4, vol: 0.07 })
+    tone({ f: f * 2.76, dur: 0.22, vol: 0.03 })
+    tone({ t: 0.09, f: f * 1.12, dur: 0.35, vol: 0.06 })
+    tone({ t: 0.09, f: f * 3.1, dur: 0.18, vol: 0.025 })
+  },
+  vendHum: () => {
+    // the machine's motor turning over, short
+    tone({ f: 90, f2: 115, dur: 0.55, type: 'sawtooth', vol: 0.022, a: 0.06 })
+    noise({ dur: 0.55, type: 'bandpass', f: 420, q: 2, vol: 0.035, a: 0.06 })
+  },
+  typing: () => {
+    // a short run of keys
+    for (let i = 0; i < 4; i++) setTimeout(() => SOUNDS.key(), i * (70 + Math.random() * 40))
+  },
   // UI
   tick: () => tone({ f: 1200, dur: 0.03, type: 'triangle', vol: 0.05 }),
   whoosh: () => noise({ dur: 0.7, type: 'bandpass', f: 300, f2: 1100, q: 0.6, vol: 0.05, a: 0.2 }), // panning between rooms

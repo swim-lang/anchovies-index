@@ -3,6 +3,7 @@ import { magnets } from '../content/magnets.js'
 import { workTags } from '../content/archive.js'
 import { prefersReducedMotion } from '../motion/timing.js'
 import { sfx } from '../motion/sound.js'
+import { cssUrl } from '../lib/cssUrl.js'
 
 /*
  * THE ARCHIVE
@@ -71,7 +72,7 @@ export default function IndexTray({ active, projects, onOpenProject }) {
             <span className="ix-name">{mg.label}</span>
             <span className="ix-tags">{tags.length ? tags.join(' · ') : '—'}</span>
           </div>
-          <span className="ix-mark" style={{ '--mark': `url(${mg.src})`, background: mg.color || '#1a1a1a', aspectRatio: `${mg.w} / ${mg.h}` }} aria-hidden="true" />
+          <span className="ix-mark" style={{ '--mark': cssUrl(mg.src), background: mg.color || '#1a1a1a', aspectRatio: `${mg.w} / ${mg.h}` }} aria-hidden="true" />
         </div>
         <div className="ix-card-foot label">{mg.project ? 'Case study →' : mg.url ? 'anchovies.agency ↗' : 'No case study yet'}</div>
       </div>

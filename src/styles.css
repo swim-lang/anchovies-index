@@ -3443,6 +3443,7 @@ ol {
 }
 .room.is-overview {
   transform: translate(0%, 0%) scale(1);
+  transition: none; /* the strip jumps home; only the objects move (they rise) */
   pointer-events: none;
 }
 /* No clipping or fading on the rooms here: either would flatten their 3D (doors

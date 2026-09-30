@@ -16,6 +16,7 @@ import { team, officePhotos } from '../content/team.js'
 import { magnets, workOrder } from '../content/magnets.js'
 import { specimens } from '../content/specimens.js'
 import { sfx } from '../motion/sound.js'
+import { cssUrl } from '../lib/cssUrl.js'
 
 /*
  * THE CABINET
@@ -93,6 +94,9 @@ const indexOf = (d) => DRAWERS.findIndex((x) => x.key === d)
 const KEY_BASE = { housekeys: [-14, 28], motokeys: [10] }
 const KEY_LEN = 180 // effective pendulum length: keys swing, they don't whirl
 const zOf = (d, m) => -indexOf(d) * (m.Hf + m.gap)
+
+// What each object sounds like when you hover it on the overview.
+const HOVER_SOUND = { cabinet: 'rustle', fridge: 'bottles', vending: 'vendHum', typewriter: 'typing' }
 
 const byRank = (list, rank) => [...list].sort((a, b) => (rank[a.id] ?? 999) - (rank[b.id] ?? 999))
 
@@ -322,24 +326,47 @@ export default function DrawerIndex({
   if (import.meta.env.DEV) window.__measure = measureOverview
   // Arriving at the overview (first load, or back from a room): the objects wait
   // below the floor, then slide up into place one after another. No zoom-out.
+  // Measure once, after every room has settled its own size (fonts loaded, the
+  // fridge's camera and the machines' fit applied), then release the rise. Never
+  // re-measure mid-slide; only a real resize re-lays it.
   const [rising, setRising] = useState(true)
   useEffect(() => {
     if (!entrance) return
-    setRising(true)
-    const up = () => requestAnimationFrame(() => requestAnimationFrame(() => setRising(false)))
-    const t1 = setTimeout(() => {
-      const r = measureOverview()
-      if (r && typeof r === 'object') up()
-    }, 60)
-    const t2 = setTimeout(() => {
-      measureOverview()
+    let alive = true
+    let released = false
+    const release = () => {
+      if (!alive || released) return
+      released = true
       setRising(false)
-    }, 600) // a retry, and a timer fallback for when frames aren't painting
-    window.addEventListener('resize', measureOverview)
+    }
+    const settle = async () => {
+      try {
+        await document.fonts?.ready
+      } catch {
+        /* ignore */
+      }
+      await new Promise((r) => setTimeout(r, 180))
+      if (!alive) return
+      let r = measureOverview()
+      if (!r || typeof r !== 'object') {
+        await new Promise((res) => setTimeout(res, 300))
+        r = alive && measureOverview()
+      }
+      // two frames so the laid-out (still lowered) positions paint before the release
+      requestAnimationFrame(() => requestAnimationFrame(release))
+      setTimeout(release, 120) // frames may not come in a background tab
+    }
+    settle()
+    let rt = 0
+    const onResize = () => {
+      clearTimeout(rt)
+      rt = setTimeout(measureOverview, 150)
+    }
+    window.addEventListener('resize', onResize)
     return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
-      window.removeEventListener('resize', measureOverview)
+      alive = false
+      clearTimeout(rt)
+      window.removeEventListener('resize', onResize)
     }
   }, [entrance, measureOverview])
   const [jump, setJump] = useState(false) // cut to a room without the pan (from the entrance)
@@ -364,7 +391,8 @@ export default function DrawerIndex({
     setHeld(null)
     if (open || which.current) await runTo(0)
     sfx('whoosh')
-    setEntrance('back') // 'back': the labels wait for the zoom-out to land
+    setRising(true) // same render as the switch, so the rooms never show at full size first
+    setEntrance('back') // 'back': the labels wait for the objects to land
   }
   const pickRoom = (key) => {
     sfx('whoosh')
@@ -1130,7 +1158,7 @@ export default function DrawerIndex({
         if (pi >= 0) (onActiveChange(pi), onOpen(pi, itemEls.current[key]))
         else if (mg.url) window.open(mg.url, '_blank', 'noopener')
       }
-      const mark = <span className="spec-mark" style={{ '--mark': `url(${mg.src})`, background: ink, aspectRatio: `${mg.w} / ${mg.h}` }} aria-hidden="true" />
+      const mark = <span className="spec-mark" style={{ '--mark': cssUrl(mg.src), background: ink, aspectRatio: `${mg.w} / ${mg.h}` }} aria-hidden="true" />
       return (
         <article
           key={key}
@@ -1532,6 +1560,7 @@ export default function DrawerIndex({
                 className="overview-room"
                 style={layout ? { '--i': i, left: layout[r.key].x, top: layout[r.key].y, width: layout[r.key].w, height: layout[r.key].h } : { '--i': i, visibility: 'hidden' }}
                 onClick={() => pickRoom(r.key)}
+                onPointerEnter={(e) => e.pointerType === 'mouse' && sfx(HOVER_SOUND[r.key], { throttle: 400 })}
                 autoFocus={i === 0}
               >
                 <span className="overview-label" style={layout ? { top: layout.floor - layout[r.key].y + 16 } : undefined}>

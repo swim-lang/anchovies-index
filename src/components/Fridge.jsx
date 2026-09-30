@@ -4,6 +4,7 @@ import { fridgeContents, wordmarkOf, wordmarkGround } from '../content/fridgeCon
 import { prefersReducedMotion } from '../motion/timing.js'
 import '../styles/fridge-inside.css'
 import { sfx } from '../motion/sound.js'
+import { cssUrl } from '../lib/cssUrl.js'
 
 /*
  * THE FRIDGE
@@ -191,7 +192,7 @@ function groundStyle(item, mg) {
   return { background: g, '--on': 0.299 * r + 0.587 * gg + 0.114 * b > 150 ? '#1c1a17' : '#fbfaf6' }
 }
 
-const Mark = ({ mg, className = '' }) => <span className={`fx-mark ${className}`} style={{ '--mark': `url(${mg.src})` }} aria-hidden="true" />
+const Mark = ({ mg, className = '' }) => <span className={`fx-mark ${className}`} style={{ '--mark': cssUrl(mg.src) }} aria-hidden="true" />
 
 // How a pack names its brand: the mark (default), the wordmark panel from the work page, or the name set in type.
 function Brand({ mg, item, on = false }) {
@@ -507,7 +508,7 @@ function Solid({ kind, mg, item }) {
       const span = 5 * w
       const ly = s.lab[0] - bodyTop
       const lh = s.lab[1] - s.lab[0]
-      if (wm) layers.push(`url(${wm}) ${(span * 0.14 - k * w).toFixed(1)}px ${ly + 5}px / ${(span * 0.72).toFixed(1)}px auto no-repeat`)
+      if (wm) layers.push(`${cssUrl(wm)} ${(span * 0.14 - k * w).toFixed(1)}px ${ly + 5}px / ${(span * 0.72).toFixed(1)}px auto no-repeat`)
       layers.push(`linear-gradient(#f4f1e8, #eeeae0) 0 ${ly}px / 100% ${lh}px no-repeat`)
     }
     layers.push(fillFor(bodyTop, s.H, s.level, s.glass, s.liquid))
@@ -926,9 +927,9 @@ export default function Fridge({ projects, onOpen, active }) {
   // ── Pan the fridge, or slide a magnet ──
   const onViewDown = (e) => {
     if (!cam || (e.pointerType === 'mouse' && e.button !== 0)) return
-    // Pressed on a door (not a magnet or product)? A click, without a drag, opens or shuts it.
-    const leaf = e.target.closest?.('.fx-front, .fx-back')
-    const bay = leaf?.closest('.fx-bay')
+    // Doors open from their handles only; a click on the inside of an open door shuts it.
+    const leaf = e.target.closest?.('.fx-back')
+    const bay = leaf?.closest('.fx-bay.is-open')
     const door = bay ? (bay.classList.contains('is-freezer') ? 'freezer' : 'fridge') : null
     drag.current = { kind: 'pan', x0: e.clientX, y0: e.clientY, cx: cam.x, cy: cam.y, pid: e.pointerId, el: e.currentTarget, moved: false, door }
   }
@@ -1059,7 +1060,7 @@ export default function Fridge({ projects, onOpen, active }) {
         style={{
           width: p.w,
           height: p.h,
-          '--mark': `url(${mg.src})`,
+          '--mark': cssUrl(mg.src),
           transform: `translate(${p.x - PAD - p.w / 2}px, ${p.y - top - p.h / 2}px) rotate(${p.r}deg)`,
           zIndex: p.z,
         }}
@@ -1130,19 +1131,16 @@ export default function Fridge({ projects, onOpen, active }) {
         </div>
 
         <div className="fx-leaf" style={{ transform: `rotateY(${isOpen ? OPEN_DEG : ajar === which ? OPEN_DEG * 0.05 : 0}deg)` }}>
-          <div
-            className={`${Face} fx-front`}
-            inert={isOpen || undefined}
-            onPointerEnter={(e) => e.pointerType === 'mouse' && setAjar(which)}
-            onPointerLeave={() => setAjar((a) => (a === which ? null : a))}
-          >
+          <div className={`${Face} fx-front`} inert={isOpen || undefined}>
             <button
               type="button"
               className={`fridge-handle${which === 'fridge' ? ' is-long' : ''}`}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? 'Close' : 'Open'} the ${doorWord[which]}`}
               onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => toggle(which)}
+              onPointerEnter={(e) => e.pointerType === 'mouse' && setAjar(which)}
+              onPointerLeave={() => setAjar((a) => (a === which ? null : a))}
+              onClick={() => (setAjar(null), toggle(which))}
             />
             {magnets.filter((mg) => pos[mg.id].door === which).map(renderMagnet)}
           </div>

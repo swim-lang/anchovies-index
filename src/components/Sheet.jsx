@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { prefersReducedMotion } from '../motion/timing.js'
+import { cssUrl } from '../lib/cssUrl.js'
 
 /*
  * A SHEET YOU CAN HANDLE
@@ -94,7 +95,7 @@ export default function Sheet({ image, caption }) {
         <div
           ref={sheetRef}
           className={`sheet${image.src.endsWith('.webp') || image.src.endsWith('.png') ? ' is-cutout' : ''}`}
-          style={{ aspectRatio: `${image.w} / ${image.h}`, '--sheet-src': `url(${image.src})` }}
+          style={{ aspectRatio: `${image.w} / ${image.h}`, '--sheet-src': cssUrl(image.src) }}
           role="img"
           aria-label={image.alt}
         >

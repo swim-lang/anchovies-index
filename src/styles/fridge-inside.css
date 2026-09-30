@@ -1195,13 +1195,10 @@ button.fx-item:hover,
   transition: none;
 }
 
-/* The doors themselves are the controls: click one to open it, click it again to shut. */
-.fx-front,
+/* Doors open from their handles; the inside of an open door shuts it. */
+.fridge-handle,
 .fx-bay.is-open .fx-back {
   cursor: pointer;
-}
-.fridge-view.is-panning .fx-front {
-  cursor: grabbing;
 }
 
 /* ─── Depth in the compartment ─────────────────────────────────────────────

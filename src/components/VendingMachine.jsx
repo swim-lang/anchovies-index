@@ -3,6 +3,7 @@ import { ROWS, COLS, serviceByCode, DESCRIPTIONS_ARE_DRAFT } from '../content/se
 import { EASE_IN_OUT, EASE_OUT, prefersReducedMotion, settled } from '../motion/timing.js'
 import '../styles/vending.css'
 import { sfx } from '../motion/sound.js'
+import { cssUrl } from '../lib/cssUrl.js'
 
 /*
  * THE VENDING MACHINE
@@ -27,7 +28,7 @@ const H = 1050
 const MAIL = 'andy@anchovies.agency'
 const FALL = 'cubic-bezier(0.5, 0, 0.9, 0.5)' // gravity: accelerates, never bounces
 const VEND_MS = 2300
-const MARK = `url(${import.meta.env.BASE_URL}assets/brand/anchovies-mark.png)`
+const MARK = cssUrl(`${import.meta.env.BASE_URL}assets/brand/anchovies-mark.png`)
 // Coins leaning in the dish, back to front. The front one is the one you take.
 const PILE = [
   { x: 0, y: 20, r: -14 },
